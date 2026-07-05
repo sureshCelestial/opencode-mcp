@@ -1,0 +1,20 @@
+{
+  "name": "opencode-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests configured\" && exit 0",
+    "verify": "node -e \"const cfg=require('./opencode.json'); const server=cfg.mcp?.atlassian; if(!server?.url){throw new Error('Missing Atlassian MCP server config')} console.log('OpenCode MCP config ok:', server.url);\""
+  },
+  "keywords": [
+    "opencode",
+    "mcp",
+    "jira",
+    "confluence",
+    "atlassian"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "OpenCode example wired to the Atlassian MCP server for Jira and Confluence"
+}
