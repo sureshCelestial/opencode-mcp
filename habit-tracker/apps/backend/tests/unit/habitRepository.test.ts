@@ -50,6 +50,15 @@ describe('habitRepository', () => {
     expect(result).toBeNull();
   });
 
+  it('updateHabit returns updated habit', async () => {
+    (pool.query as jest.Mock)
+      .mockResolvedValueOnce({ rows: [mockHabitRow] }) // get existing
+      .mockResolvedValueOnce({ rows: [{ ...mockHabitRow, name: 'Updated' }] }); // update
+    const result = await repo.updateHabit('uuid-1', { name: 'Updated' });
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe('Updated');
+  });
+
   it('updateHabit returns null if habit missing', async () => {
     (pool.query as jest.Mock).mockResolvedValue({ rows: [] });
     const result = await repo.updateHabit('missing', { name: 'X' });

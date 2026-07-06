@@ -77,4 +77,11 @@ describe('calculateStreaks', () => {
     expect(stats.longestStreak).toBe(3);
     expect(stats.currentStreak).toBe(0); // unless today is 2026-07-03 or later, which it isn't in this test data
   });
+
+  it('handles unknown frequency gracefully', () => {
+    const habit = makeHabit({ startDate: '2026-07-01', frequency: 'unknown' as any });
+    const stats = calculateStreaks(habit, []);
+    expect(stats.completionPercentage).toBe(0);
+    expect(stats.currentStreak).toBe(0);
+  });
 });
