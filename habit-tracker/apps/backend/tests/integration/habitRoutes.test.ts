@@ -55,6 +55,23 @@ describe('Habit CRUD API', () => {
     expect(res.status).toBe(204);
   });
 
+  it('DELETE /api/v1/habits/:id returns 404 if missing', async () => {
+    (pool.query as jest.Mock).mockResolvedValue({ rowCount: 0 });
+    const res = await request(app).delete('/api/v1/habits/uuid-missing');
+    expect(res.status).toBe(404);
+  });
+
+  it('PUT /api/v1/habits/:id updates habit', async () => {
+    (pool.query as jest.Mock)
+      .mockResolvedValueOnce({ rows: [mockRow()] })
+      .mockResolvedValueOnce({ rows: [mockRow({ name: 'Updated' })] });
+    const res = await request(app)
+      .put('/api/v1/habits/uuid-1')
+      .send({ name: 'Updated', category: 'Health', frequency: 'daily', reminderTime: '08:00', startDate: '2026-01-01' });
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe('Updated');
+  });
+
   it('returns 400 on invalid create payload', async () => {
     const res = await request(app).post('/api/v1/habits').send({ name: '' });
     expect(res.status).toBe(400);
