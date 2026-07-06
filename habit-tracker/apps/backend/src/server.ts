@@ -4,18 +4,28 @@ dotenv.config();
 import app from './app';
 import config from './config';
 import logger from './middleware/logger';
+import { runMigrations } from './utils/runMigrations';
 
-const server = app.listen(config.port, () => {
-  logger.info(`Server listening on port ${config.port}`);
-});
+runMigrations()
+  .then(() => {
+    const server = app.listen(config.port, () => {
+      logger.info(`Server listening on port ${config.port}`);
+    });
 
-const gracefulShutdown = (signal: string) => {
-  logger.info(`${signal} received. Shutting down gracefully.`);
-  server.close(() => {
-    logger.info('Server closed.');
-    process.exit(0);
+    const gracefulShutdown = (signal: string) => {
+      logger.info(`${signal} received. Shutting down gracefully.`);
+      server.close(() => {
+        logger.info('Server closed.');
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  })
+  .catch((err) => {
+    logger.error('Failed to start server', err);
+    process.exit(1);
   });
-};
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
