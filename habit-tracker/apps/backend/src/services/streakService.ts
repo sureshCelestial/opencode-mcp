@@ -40,6 +40,20 @@ function formatLocalDate(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+export function countScheduledDays(habit: Habit): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = parseLocalDate(habit.startDate);
+  start.setHours(0, 0, 0, 0);
+  let count = 0;
+  const d = new Date(start);
+  while (d <= today) {
+    if (isScheduled(d, habit)) count++;
+    d.setDate(d.getDate() + 1);
+  }
+  return count;
+}
+
 export function calculateStreaks(habit: Habit, completionDates: string[]): StreakStats {
   const completionsSet = new Set(completionDates);
   const today = new Date();
