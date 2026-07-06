@@ -10,10 +10,18 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export async function list(_req: Request, res: Response, next: NextFunction) {
+export async function list(req: Request, res: Response, next: NextFunction) {
   try {
-    const habits = await service.listHabits();
-    res.json(habits);
+    const { habits, total } = await service.listHabits({
+      search: req.query.search as string,
+      category: req.query.category as string,
+      frequency: req.query.frequency as string,
+      sortBy: req.query.sortBy as string,
+      order: (req.query.order as 'asc' | 'desc') || 'desc',
+      page: req.query.page ? parseInt(req.query.page as string, 10) : undefined,
+      limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
+    });
+    res.json({ data: habits, total, page: req.query.page ? parseInt(req.query.page as string, 10) : 1 });
   } catch (err) {
     next(err);
   }
