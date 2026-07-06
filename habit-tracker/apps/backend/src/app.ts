@@ -26,6 +26,9 @@ app.get('/health', (_req, res) => {
 import habitRoutes from './routes/habitRoutes';
 app.use('/api/v1/habits', habitRoutes);
 
+import { getDashboard } from './controllers/dashboardController';
+app.get('/api/v1/dashboard', getDashboard);
+
 app.use((_req, res) => {
   res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Resource not found' } });
 });
