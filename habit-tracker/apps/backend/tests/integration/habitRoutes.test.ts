@@ -39,7 +39,8 @@ describe('Habit CRUD API', () => {
     (pool.query as jest.Mock).mockResolvedValue({ rows: [mockRow()] });
     const res = await request(app).get('/api/v1/habits');
     expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.total).toBe(1);
   });
 
   it('GET /api/v1/habits/:id returns 404 if missing', async () => {
@@ -58,5 +59,27 @@ describe('Habit CRUD API', () => {
     const res = await request(app).post('/api/v1/habits').send({ name: '' });
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('GET /api/v1/habits supports search query', async () => {
+    (pool.query as jest.Mock).mockResolvedValue({ rows: [mockRow({ name: 'Morning Yoga' }), mockRow({ name: 'Evening Run' })] });
+    const res = await request(app).get('/api/v1/habits?search=run');
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].name).toBe('Evening Run');
+  });
+
+  it('GET /api/v1/habits supports category filter', async () => {
+    (pool.query as jest.Mock).mockResolvedValue({ rows: [mockRow({ category: 'Fitness' }), mockRow({ category: 'Health' })] });
+    const res = await request(app).get('/api/v1/habits?category=Fitness');
+    expect(res.status).toBe(200);
+    expect(res.body.data.every((h: any) => h.category === 'Fitness')).toBe(true);
+  });
+
+  it('GET /api/v1/habits supports sorting', async () => {
+    (pool.query as jest.Mock).mockResolvedValue({ rows: [mockRow({ name: 'B' }), mockRow({ name: 'A' })] });
+    const res = await request(app).get('/api/v1/habits?sortBy=name&order=asc');
+    expect(res.status).toBe(200);
+    expect(res.body.data[0].name).toBe('A');
   });
 });

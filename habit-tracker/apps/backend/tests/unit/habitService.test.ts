@@ -14,7 +14,7 @@ describe('habitService', () => {
   it('delegates list to repository', async () => {
     (repo.getAllHabits as jest.Mock).mockResolvedValue([]);
     const result = await service.listHabits();
-    expect(result).toEqual([]);
+    expect(result).toEqual({ habits: [], total: 0 });
   });
 
   it('delegates get to repository', async () => {
